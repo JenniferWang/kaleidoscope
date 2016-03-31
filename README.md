@@ -52,7 +52,7 @@ defn =  try extern
 
 ```
 
-These two snippet actually shows the difference between AST and CST. 
-* As AST is the parse result which only captures the semantic, there are no intermediate categories (factor, definition, precedence of operators) in order to build the tree inambiguously.
-* CST is specific to the programming language. In this toy language, "+" is an infix operator; however, it could be prefix in another language. As this has nothing to do with the semantics, we only need a `BinOp` category in AST. 
-* We only need AST for the compiler backend, say type checking.
+These two code snippets actually demonstrate the difference between AST and CST. 
+* In AST, there are no intermediate categories (factor, definition, precedence of operators) in order to build the tree unambiguously. 
+* CST is specific to the syntax of the programming language. In this toy language, we specify that "+" is an infix operator; however, it could be prefix in another language. As this has nothing to do with the semantics, we only need a `BinOp` category in AST. 
+* We need AST for the compiler backend, say type checking.
