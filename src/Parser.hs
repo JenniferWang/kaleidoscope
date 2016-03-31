@@ -49,15 +49,15 @@ call = do
   return $ Call name args
 
 {-
-  Grammar of the language
+  Context Free Grammar of the language
 
-  Expr -> Factor + Factor | Factor - Factor
-        | Factor * Factor | Factor / Factor (with higher precedence)
+  Expr -> Factor '+' Factor | Factor '-' Factor
+        | Factor '*' Factor | Factor '/' Factor (with higher precedence)
 
-  Factor -> floating | int | extern | function | call | variable
+  Factor -> floating | int | Extern | Function | Call | variable
           | (Expr)
 
-  Defn -> extern | function
+  Defn -> Extern | Function
         | Expr
 
   Toplevel -> Defn Toplevel | epsilon
