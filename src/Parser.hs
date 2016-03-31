@@ -16,37 +16,30 @@ table = [ [ binary "*" Times Ex.AssocLeft, binary "/" Divide Ex.AssocLeft]
         ]
 
 int :: Parser Expr
-int = integer >>= return . Float . fromInteger
+int = Float <$> (fromInteger <$> integer)
 
 floating :: Parser Expr
-floating = float >>= return . Float
+floating = Float <$> float
 
 expr :: Parser Expr
 expr = Ex.buildExpressionParser table factor
 
 variable :: Parser Expr
-variable = identifier >>= return . Var
+variable = Var <$> identifier
 
 function :: Parser Expr
-function = do
-  reserved "def" -- TODO:duplicated?
-  name <- identifier
-  args <- parens $ many variable
-  body <- expr
-  return $ Function name args body
+function = reserved "def"                         -- TODO: duplicated?
+        *> (Function <$> identifier               -- name
+                     <*> parens (many variable)   -- arguments
+                     <*> expr)                    -- body
 
 extern :: Parser Expr
-extern = do
-  reserved "extern"
-  name <- identifier
-  args <- parens $ many variable
-  return $ Extern name args
+extern = reserved "extern"
+      *> (Extern <$> identifier                   -- name
+                 <*> (parens $ many variable))    -- arguments
 
 call :: Parser Expr
-call = do
-  name <- identifier
-  args <- parens $ commaSep expr
-  return $ Call name args
+call = Call <$> identifier <*> (parens $ commaSep expr)
 
 {-
   Context Free Grammar of the language
@@ -78,17 +71,10 @@ defn =  try extern
     <|> expr
 
 contents :: Parser a -> Parser a
-contents p = do
-  Tok.whiteSpace lexer
-  r <- p
-  eof
-  return r
+contents p = Tok.whiteSpace lexer *> p <* eof
 
 toplevel :: Parser [Expr]
-toplevel = many $ do
-  def <- defn
-  reservedOp ";"
-  return def
+toplevel = many $ defn <* reservedOp ";"
 
 parseExpr :: String -> Either ParseError Expr
 parseExpr = parse (contents expr) "<stdin>"
