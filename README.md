@@ -7,7 +7,7 @@ Following the [tutorial](http://www.stephendiehl.com/llvm) by Stephen Diehl
 
 ### Notes
 ##### Abstract Syntax Tree and Concrete Syntax Tree
-[Here](https://github.com/JenniferWang/kaleidoscope/asset/AST_CST.pdf) is a good explanation on the comparison between these two concepts. [Another](https://github.com/JenniferWang/kaleidoscope/assert/AST_CST2.pdf).
+[Here](./asset/AST_CST.pdf) is a good explanation on the comparison between these two concepts. [Another](./assert/AST_CST2.pdf).
 
 AST is usually the last product of the front-end of a compiler which captures the semantics of the source code while CST is usually not built explicitly and captures syntactic meaning, say `;` is the end of a statement. 
 
