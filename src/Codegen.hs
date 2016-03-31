@@ -238,5 +238,25 @@ fcmp cond a b = instr $ FCmp cond a b []
 cons :: C.Constant -> Operand
 cons = ConstantOperand
 
+-- control flow
 br :: Name -> Codegen (Named Terminator)
 br val = terminator $ Do $ Br val []
+
+cbr :: Operand -> Name -> Name -> Codegen (Named Terminator)
+cbr cond tr fl = terminator $ Do $ CondBr cond tr fl []
+
+ret :: Operand -> Codegen (Named Terminator)
+ret val = terminator $ Do $ Ret (Just val) []
+
+-- invoke memory and evaluate side-effects
+call :: Operand -> [Operand] -> Codegen Operand
+call fn args = instr $ Call Nothing CC.C [] (Right fn) (toArgs args) [] []
+
+alloca :: Type -> Codegen Operand
+alloca ty = instr $ Alloca ty Nothing 0 []
+
+store :: Operand -> Operand -> Codegen Operand
+store ptr val = instr $ Store False ptr val Nothing 0 []
+
+load :: Operand -> Codegen Operand
+load ptr = instr $ Load False ptr Nothing 0 []
