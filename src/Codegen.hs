@@ -56,6 +56,7 @@ external ret_type label argtys = addDefn $
   GlobalDefinition $ functionDefaults {
     name        = Name label
   , parameters  = ([Parameter ty nm [] | (ty, nm) <- argtys], False)
+  , returnType  = ret_type
   , basicBlocks = []
   }
 
@@ -108,6 +109,18 @@ data BlockState = BlockState {
 
 newtype Codegen a = Codegen { runCodegen :: State CodegenState a }
   deriving (Functor, Applicative, Monad, MonadState CodegenState )
+
+sortBlocks :: [(Name, BlockState)] -> [(Name, BlockState)]
+sortBlocks = sortBy (compare `on` (idx . snd))
+
+createBlocks :: CodegenState -> [BasicBlock]
+createBlocks m = map makeBlock $ sortBlocks $ Map.toList (blocks m)
+
+makeBlock :: (Name, BlockState) -> BasicBlock
+makeBlock (l, (BlockState _ s t)) = BasicBlock l s (maketerm t)
+  where
+    maketerm (Just x) = x
+    maketerm Nothing  = error $ "Block has no terminator: " ++ (show l)
 
 entryBlockName :: String
 entryBlockName = "entry"
@@ -237,6 +250,12 @@ fcmp cond a b = instr $ FCmp cond a b []
 
 cons :: C.Constant -> Operand
 cons = ConstantOperand
+
+uitofp :: Type -> Operand -> Codegen Operand
+uitofp ty a = instr $ UIToFP a ty []
+
+toArgs :: [Operand] -> [(Operand, [A.ParameterAttribute])]
+toArgs = map (\x -> (x, []))
 
 -- control flow
 br :: Name -> Codegen (Named Terminator)

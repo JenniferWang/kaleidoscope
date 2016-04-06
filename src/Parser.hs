@@ -9,10 +9,10 @@ import qualified Text.Parsec.Token as Tok
 import Lexer
 import Syntax
 
-binary s f assoc = Ex.Infix (reservedOp s >> return (BinOp f)) assoc
+binary s assoc = Ex.Infix (reservedOp s >> return (BinaryOp s)) assoc
 
-table = [ [ binary "*" Times Ex.AssocLeft, binary "/" Divide Ex.AssocLeft]
-        , [ binary "+" Plus Ex.AssocLeft, binary "-" Minus Ex.AssocLeft]
+table = [ [ binary "*" Ex.AssocLeft, binary "/" Ex.AssocLeft]
+        , [ binary "+" Ex.AssocLeft, binary "-" Ex.AssocLeft]
         ]
 
 int :: Parser Expr
@@ -30,13 +30,13 @@ variable = Var <$> identifier
 function :: Parser Expr
 function = reserved "def"                         -- TODO: duplicated?
         *> (Function <$> identifier               -- name
-                     <*> parens (many variable)   -- arguments
+                     <*> parens (many identifier) -- arguments
                      <*> expr)                    -- body
 
 extern :: Parser Expr
 extern = reserved "extern"
       *> (Extern <$> identifier                   -- name
-                 <*> (parens $ many variable))    -- arguments
+                 <*> (parens $ many identifier))  -- arguments
 
 call :: Parser Expr
 call = Call <$> identifier <*> (parens $ commaSep expr)
